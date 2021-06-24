@@ -21,7 +21,7 @@ export class BlogStorage implements IStorageFactory {
   }
 
   async GetRankingClient() {
-    const blockClient = this.GetBlockBlobClient("Client.txt");
+    const blockClient = this.GetBlockBlobClient("client.txt");
     const downloadBlockBlobResponse = await blockClient.download();
 
     const downloaded = (
@@ -38,7 +38,7 @@ export class BlogStorage implements IStorageFactory {
   }
 
   GetRankingProduct(): any[] {
-    throw new Error("Method not implemented.");
+    throw new Error("method not implemented.");
   }
 
   async GetFindClient(name: string) {
@@ -46,18 +46,18 @@ export class BlogStorage implements IStorageFactory {
   }
 
   GetFindProduct(name: string): any[] {
-    throw new Error("Method not implemented.");
+    throw new Error("method not implemented.");
   }
 
   async SaveRankingClient(data: IGeneric) {
     const getClient = await this.GetRankingClient();
     getClient.push(data);
     const clientString = JSON.stringify(getClient);
-    await this.UploadBlobContent("Client.txt", clientString);
+    await this.UploadBlobContent("client.txt", clientString);
   }
 
   SaveRankingProduct(data: IGeneric): void {
-    throw new Error("Method not implemented.");
+    throw new Error("method not implemented.");
   }
 
   private async createBlob(nameBlob: string) {

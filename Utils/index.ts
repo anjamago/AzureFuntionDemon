@@ -5,10 +5,10 @@ import { instanceName } from "../config/Keys";
 export const CreateInstance = () => {
   console.log(instanceName);
 
-  if (instanceName === "Blob") {
+  if (instanceName === "blob") {
     return new BlogStorage();
   }
-  if (instanceName === "Mongo") {
+  if (instanceName === "mongo") {
     return new PersistenceDBMongo();
   }
 };
