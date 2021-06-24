@@ -1,10 +1,10 @@
-export interface IStorageFactory{
+import { IGeneric } from "./model";
 
-    GetRankingClient():Array<any>;
-    GetRankingProduct():Array<any>;
-    GetFindClient(name:string):Array<any>;
-    GetFindProduct(name:string):Array<any>;
-    SaveRankingClient(data:string):void;
-    SaveRankingProduct(data:string):void;
-    
+export interface IStorageFactory {
+  GetRankingClient();
+  GetRankingProduct();
+  GetFindClient(name: string);
+  GetFindProduct(name: string);
+  SaveRankingClient(data: IGeneric);
+  SaveRankingProduct(data: IGeneric);
 }

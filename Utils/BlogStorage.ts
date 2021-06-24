@@ -6,50 +6,57 @@ import {
 
 import { IStorageFactory } from "./IStorageFactory";
 import { account, accountKey, containerName } from "../config/Keys";
+import { Convert } from "./Convert";
+import { IGeneric } from "./model";
 
 export class BlogStorage implements IStorageFactory {
-  private sharedKeyCredential;
-  private containerClient;
+  /*  private sharedKeyCredential;
+  private containerClient; */
   private blobServiceClient;
 
   constructor() {
-    this.sharedKeyCredential = new StorageSharedKeyCredential(
-      account,
-      accountKey
-    );
-
-    this.containerClient = new ContainerClient(
-      `https://${account}.blob.core.windows.net/${containerName}`,
-      this.sharedKeyCredential
-    );
-
-    this.blobServiceClient = new BlobServiceClient(
-      `https://${account}.blob.core.windows.net`,
-      this.sharedKeyCredential
+    this.blobServiceClient = BlobServiceClient.fromConnectionString(
+      "DefaultEndpointsProtocol=https;AccountName=basededatosdemon;AccountKey=qXi9qJkx4/BkAwZU8RXlzEptNViLdlP2six/eYjjprxW+CK7lzTjPe5RHXEoE74/54X/Uy/SQPtqs1NPlxrtSA==;EndpointSuffix=core.windows.net"
     );
   }
 
-  GetRankingClient(): any[] {
-    const blockClient = this.GetBlockBlobClient("Clients");
-    console.log(blockClient);
-    return [];
+  async GetRankingClient() {
+    const blockClient = this.GetBlockBlobClient("Client.txt");
+    const downloadBlockBlobResponse = await blockClient.download();
+
+    const downloaded = (
+      await Convert.streamToBuffer(downloadBlockBlobResponse.readableStreamBody)
+    ).toString();
+
+    if (!downloaded) {
+      return [];
+    }
+
+    const json: IGeneric[] = JSON.parse(downloaded);
+
+    return json;
   }
+
   GetRankingProduct(): any[] {
     throw new Error("Method not implemented.");
   }
-  GetFindClient(name: string): any[] {
-    throw new Error("Method not implemented.");
+
+  async GetFindClient(name: string) {
+    return [];
   }
+
   GetFindProduct(name: string): any[] {
     throw new Error("Method not implemented.");
   }
-  async SaveRankingClient(data: string) {
-    const getClient = this.GetRankingClient();
+
+  async SaveRankingClient(data: IGeneric) {
+    const getClient = await this.GetRankingClient();
+    getClient.push(data);
     const clientString = JSON.stringify(getClient);
-    const blocBlobClient = this.GetBlockBlobClient("Clients");
-    await this.UploadBlobContent("Clients", clientString);
+    await this.UploadBlobContent("Client.txt", clientString);
   }
-  SaveRankingProduct(data: string): void {
+
+  SaveRankingProduct(data: IGeneric): void {
     throw new Error("Method not implemented.");
   }
 
@@ -71,8 +78,8 @@ export class BlogStorage implements IStorageFactory {
   }
 
   private GetBlockBlobClient(blobName: string) {
-    const blobClient = this.containerClient.getBlobClient(blobName);
-    const blockBlobClient = blobClient.getBlockBlobClient();
-    return blockBlobClient;
+    const container = this.blobServiceClient.getContainerClient(containerName);
+    const blobClient = container.getBlockBlobClient(blobName);
+    return blobClient;
   }
 }
